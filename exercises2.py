@@ -110,7 +110,7 @@ def GS_modified(A):
     :return R: nxn numpy array
     """
     m,n = A.shape
-    Q = A.copy()
+    Q = A.astype(complex)
     R = np.zeros((n, n), dtype=complex)
     for i in range(n):
         R[i,i] = np.linalg.norm(Q[:,i])
@@ -135,11 +135,11 @@ def GS_modified_get_R(A, k):
     :return R: nxn numpy array
     """
 
-    m,n = A.shape
-    R = np.eye(n, order='C', dtype='complex')
-    R[k,k] = 1 / np.linalg.norm(A[:,k])
-    Ahat = 1 * A
-    Ahat[:,k] = A[:,k] / R[k,k]
+    m, n = A.shape
+    Ahat = A.astype(complex)
+    R = np.eye(n, dtype=complex)
+    R[k,k] = 1 / np.linalg.norm(Ahat[:,k])    
+    Ahat[:,k] = Ahat[:,k] / R[k,k]
     for i in range(k,n):
         R[k,i] = -np.linalg.norm(np.vdot(Ahat[:,k], Ahat[:,k])) / R[k,k]
     return R
@@ -156,10 +156,11 @@ def GS_modified_R(A):
     """
 
     m, n = A.shape
-    R = np.eye(n)
+    A = 1.0*A
+    R = np.eye(n, dtype=A.dtype)
     for i in range(n):
         Rk = GS_modified_get_R(A, i)
-        np.dot(A, Rk, out=A)
-        np.dot(R, Rk, out=R)
+        A[:,:] = np.dot(A, Rk)
+        R[:,:] = np.dot(R, Rk)
     R = np.linalg.inv(R)
     return A, R

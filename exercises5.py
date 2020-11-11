@@ -37,22 +37,32 @@ def backward_stability_householder(m):
     for k in range(20):
         Q1 = randomQ(m)
         R1 = randomR(m)
-
-        raise NotImplementedError
-
+        A = np.dot(Q1, R1)
+        Q2, R2 = np.linalg.qr(A)
+        q = np.linalg.norm(Q1 - Q2)
+        r = np.linalg.norm(R1 - R2)
+        a = np.linalg.norm(A - Q2.dot(R2))
+        print("||Q1-Q2|| = ", q)
+        print("||R1-R2|| = ", r)
+        print("||A-Q2R2|| = ", a)
+    return None
 
 def solve_R(R, b):
     """
     Solve the system Rx=b where R is an mxm upper triangular matrix 
     and b is an m dimensional vector.
 
-    :param A: an mxm-dimensional numpy array
+    :param R: an mxm-dimensional numpy array
     :param b: an m-dimensional numpy array
 
     :param x: an m-dimensional numpy array
     """
-                     
-    raise NotImplementedError
+    m, _ = R.shape
+    x = np.zeros(m)
+    x[-1] = b[-1] / R[-1,-1]
+    for i in range(m-2, -1, -1):
+        x[i] = (b[i] - np.dot(R[i,i+1:], x[i+1:])) / R[i,i]
+    return x
 
 
 def back_stab_solve_R(m):

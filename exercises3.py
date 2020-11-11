@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.linalg import solve_triangular
 
 def householder(A, kmax=None):
     """
@@ -18,15 +18,16 @@ def householder(A, kmax=None):
     R = 1.0*A
     if kmax is None:
         kmax = n
-    for k in range(n):
+    kmax=min(m,kmax)
+    for k in range(kmax):
         x = R[k:,k]
-        v = 1*x
+        v = 1.0*x
         s = np.sign(x[0])
         if s==0:
             s=1 #fixing sign(0)=1, which is not true in numpy
         v[0] += s * np.linalg.norm(x)
         v = v / np.linalg.norm(v)
-        R[k:,k:] -= 2 * v * np.dot(R[k:,k:], v.conj().transpose())
+        R[k:,k:] -= 2 * np.dot(np.outer(v, v.conj().transpose()), R[k:,k:])
     return R
 
 
@@ -42,9 +43,14 @@ def householder_solve(A, b):
     :return x: an mxk-dimensional numpy array whose columns are the \
     right-hand side vectors x_1,x_2,...,x_k.
     """
-
-    raise NotImplementedError
-
+    m, k = b.shape
+    Ahat = np.zeros((m,m+1))
+    x = np.zeros((m,k))
+    for i in range(k):
+        Ahat[:,:m] = 1.0*A
+        Ahat[:,m] = 1.0*b[:,i]
+        Rhat = householder(Ahat, m)
+        x[:,i] = solve_triangular(Rhat[:,:m], Rhat[:,m])
     return x
 
 
@@ -58,8 +64,15 @@ def householder_qr(A):
     :return Q: an mxm-dimensional numpy array
     :return R: an mxn-dimensional numpy array
     """
+    m, n = A.shape
+    I = np.eye(m)
+    Ahat = np.zeros((m, n+m), dtype = complex)
+    Ahat[:, :n] = A
+    Ahat[:, n:] = I
 
-    raise NotImplementedError
+    Rhat = householder(Ahat)
+    R = Rhat[:,:n]
+    Q = Rhat[:,n:].transpose().conj()
 
     return Q, R
 
@@ -74,7 +87,12 @@ def householder_ls(A, b):
 
     :return x: an n-dimensional numpy array
     """
+    m, n = A.shape
+    Ahat = np.zeros((m, n+1))
+    Ahat[:,:n] = 1.0*A
+    Ahat[:, n] = 1.0*b
 
-    raise NotImplementedError
+    Rhat = householder(Ahat)
+    x = solve_triangular(Rhat[:n,:n], Rhat[:n,n])
 
     return x

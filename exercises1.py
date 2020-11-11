@@ -127,7 +127,7 @@ def ABiC(Ahat, xr, xi):
     with
 
     :param Ahat: an mxm-dimensional numpy array with Ahat[i,j] = B[i,j] \
-    for i<=j and Ahat[i,j] = C[i,j] for i>j.
+    for i>=j and Ahat[i,j] = C[i,j] for i<j.
 
     :return zr: m-dimensional numpy arrays containing the real part of z.
     :return zi: m-dimensional numpy arrays containing the imaginary part of z.
@@ -141,8 +141,8 @@ def ABiC(Ahat, xr, xi):
     C=-C.T
     """
     for i in range(m):
-        zr[i] += np.vdot(Ahat[i,:i+1],xr[:i+1]) + np.vdot(Ahat[i+1:,i],xr[i+1:]) #Bxr
-        zr[i] += - np.vdot(Ahat[:i,i],xi[:i]) + np.vdot(Ahat[i,i+1:],xi[i+1:]) #-Cxi
-        zi[i] += np.vdot(Ahat[i,:i+1],xi[:i+1]) + np.vdot(Ahat[i+1:,i],xi[i+1:]) #Bxi
-        zi[i] += np.vdot(Ahat[:i,i],xr[:i]) - np.vdot(Ahat[i,i+1:],xr[i+1:]) #Cxr
+        zr[i] += np.vdot(Ahat[:i+1,i],xr[:i+1]) + np.vdot(Ahat[i,i+1:],xr[i+1:]) #Bxr
+        zr[i] += - np.vdot(Ahat[i,:i],xi[:i]) + np.vdot(Ahat[i+1:,i],xi[i+1:]) #-Cxi
+        zi[i] += np.vdot(Ahat[:i+1,i],xi[:i+1]) + np.vdot(Ahat[i,i+1:],xi[i+1:]) #Bxi
+        zi[i] += np.vdot(Ahat[i,:i],xr[:i]) - np.vdot(Ahat[i+1:,i],xr[i+1:]) #Cxr
     return zr, zi
