@@ -87,13 +87,13 @@ def GS_classical(A):
     :return Q: mxn numpy array
     :return R: nxn numpy array
     """
-    V = A*1.0
+    V = A.astype(complex)
     m,n = A.shape
     Q = np.zeros((m, n), dtype=complex)
     R = np.zeros((n, n), dtype=complex)
     for k in range(n):
         for i in range(k-1):
-            R[i,k] = np.vdot(Q[:,i], A[:,k])
+            R[i,k] = np.vdot(Q[:,i], V[:,k])
             V[:,k] -= R[i,k] * Q[:,i]
         R[k,k] = np.linalg.norm(V[:,k])
         Q[:,k] = V[:,k] / R[k,k]
