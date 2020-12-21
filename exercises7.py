@@ -8,8 +8,11 @@ def perm(p, i, j):
 
     :param p: an m-dimensional numpy array of integers.
     """
-
-    raise NotImplementedError
+    a = 1*p[i]
+    p[i] = 1*p[j]
+    p[j] = 1*a
+    
+    return p
 
 
 def LUP_inplace(A):
@@ -25,8 +28,21 @@ def LUP_inplace(A):
     :return p: an m-dimensional integer array describing the permutation \
     i.e. (Px)[i] = x[p[i]]
     """
-                     
-    raise NotImplementedError
+    m = A.shape[0]
+    p = np.arange(m)
+    for k in range(m-1):
+        i = 1*k
+        for j in range(k+1,m):
+            if abs(A[j,k])>abs(A[i,k]):
+                i = 1*j
+        p = perm(p, i, k)
+        b = 1.0*A[k:,i]
+        A[k:,i] = 1.0*A[k:,k]
+        A[k:,k] = 1.0*b
+        A[k+1:,k] /= A[k,k]
+        A[k+1:,k+1:] -= np.outer(A[k+1:,k], A[k,k+1:])
+        
+    return p
 
 
 def solve_LUP(A, b):

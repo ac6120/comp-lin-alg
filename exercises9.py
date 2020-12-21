@@ -1,5 +1,7 @@
+import math
 import numpy as np
 import numpy.random as random
+from cla_utils import *
 
 def get_A100():
     """
@@ -171,7 +173,13 @@ def pure_QR(A, maxit, tol):
 
     :return Ak: the result
     """
-
-    raise NotImplementedError
-
-
+    m = A.shape[0]
+    A0 = 1.0*A
+    for i in range(maxit):
+        Q, R = np.linalg.qr(A0)
+        #Q, R = householder_qr(A0)
+        A0 = R.dot(Q)
+        e = np.linalg.norm(np.diag(A0, -1))
+        if (e < tol):
+            break
+    return A0

@@ -1,6 +1,6 @@
 import numpy as np
 import numpy.random as random
-
+from cla_utils import *
 
 def arnoldi(A, b, k):
     """
@@ -15,8 +15,18 @@ def arnoldi(A, b, k):
     :return H: a (k+1)xk dimensional numpy array containing the upper \
     Hessenberg matrix
     """
-
-    raise NotImplementedError
+    H = np.zeros((k+1,k), dtype=complex)
+    m = A.shape[0]
+    Q = np.zeros((m,k+1), dtype=complex)
+    Q[:,0] = b / np.linalg.norm(b)
+    for n in range(k):
+        v = A.dot(Q[:,n])
+        for j in range(n+1):
+            H[j,n] = np.dot(Q[:,j].conj(), v)
+            v -= H[j,n]*Q[:,j]
+        H[n+1,n] = np.linalg.norm(v)
+        Q[:,n+1] = v / H[n+1,n]
+    return Q, H
 
 
 def GMRES(A, b, maxit, tol, x0=None, return_residual_norms=False,
@@ -43,8 +53,59 @@ def GMRES(A, b, maxit, tol, x0=None, return_residual_norms=False,
 
     if x0 is None:
         x0 = b
+
+    conv = False
     
-    raise NotImplementedError
+    m = A.shape[0]
+    Q = np.zeros((m,maxit+1), dtype=complex)
+    Q[:,0] = b / np.linalg.norm(b)
+
+    H = np.zeros((maxit+1,maxit), dtype=complex)
+
+    nits = -1
+    
+    x = 1.0*x0
+    
+    r = np.array([], dtype=complex).reshape(m,0)
+    rnorms = []
+    
+    for n in range(maxit):
+        v = A.dot(Q[:,n])
+        
+        for j in range(n+1):
+            H[j,n] = np.dot(Q[:,j].conj().transpose(), v)
+            v -= H[j,n] * Q[:,j]
+
+        e1b = np.zeros((n+1,1))
+        e1b[0,0] = np.linalg.norm(b)
+        
+        H[n+1,n] = np.linalg.norm(v)
+        Q[:,n+1] = v / H[n+1,n]
+        
+        y = np.linalg.lstsq(H[:n+1,:n], e1b, rcond=None)[0]
+        #y = householder_ls(H[:n+1,:n], e1b)[0]
+        x = Q[:,:n] @ y
+        r = np.hstack((r, b-A.dot(x)))
+        rnorms.append(np.linalg.norm(r[:,n]))
+
+        nits +=1
+        
+        if rnorms[n]<tol :
+            conv = True
+            break
+
+    if not conv:
+        nits = -1
+    rnorms = np.array(rnorms)
+    if return_residual_norms:
+        if return_residuals:
+            return x, nits, rnorms, r
+        else:
+            return x, nits, rnorms
+    elif return_residuals:
+        return x, nits, r
+    else:
+        return x, nits
 
 
 def get_AA100():

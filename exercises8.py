@@ -9,8 +9,17 @@ def Q1AQ1s(A):
 
     :return A1: an mxm numpy array
     """
-
-    raise NotImplementedError
+    x = A[:,0]
+    v = 1.0*x
+    s = np.sign(x[0])
+    if s==0:
+        s=1 #fixing sign(0)=1, which is not true in numpy
+    v[0] += s * np.linalg.norm(x)
+    v = v / np.linalg.norm(v)
+    A1 = 1.0*A
+    A1 -= 2 * np.dot(np.outer(v, v.conj().transpose()), A1)
+    A1 -= 2 * (np.dot(np.outer(v, v.conj().transpose()), A1.T.conj())).T.conj()
+    return A1
 
 
 def hessenberg(A):
@@ -20,8 +29,20 @@ def hessenberg(A):
 
     :param A: an mxm numpy array
     """
-
-    raise NotImplementedError
+    m = A.shape[0]
+    H = A
+    for k in range(m-2):
+        x = H[k+1:,k]
+        v = 1.0*x
+        s = np.sign(x[0])
+        if s==0:
+            s = 1 #fixing sign(0)=1, which is not true in numpy
+        H[k+1,k] = s * np.linalg.norm(x)
+        v[0] += H[k+1,k]
+        v = v / np.linalg.norm(v)
+        H[k+2:,k] = 0
+        H[k+1:,k+1:] -= 2 * np.dot(np.outer(v, v.conj().transpose()), H[k+1:,k+1:])
+        H[k:,k+1:] -= 2 * H[k:,k+1:].dot(np.outer(v, v.conj().transpose()))
 
 
 def hessenbergQ(A):
@@ -34,8 +55,20 @@ def hessenbergQ(A):
     
     :return Q: an mxm numpy array
     """
-
-    raise NotImplementedError
+    m = A.shape[0]
+    Q = np.eye(m, dtype=A.dtype)
+    for k in range(m-1):
+        x = A[k+1:,k]
+        v = 1.0*x
+        s = np.sign(x[0])
+        if s==0:
+            s = 1 #fixing sign(0)=1, which is not true in numpy
+        v[0] += s * np.linalg.norm(x)
+        v = v / np.linalg.norm(v)
+        A[k+1:,k:] -= 2 * np.dot(np.outer(v, v.conj().transpose()), A[k+1:,k:])
+        A[:,k+1:] -= 2 * A[:,k+1:].dot(np.outer(v, v.conj().transpose()))
+        Q[k+1:,:] -= 2 * np.outer(v, np.dot(v.conj().transpose(), Q[k+1:,:]))
+    return Q.conj().transpose()
 
 def hessenberg_ev(H):
     """

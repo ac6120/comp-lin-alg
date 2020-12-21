@@ -18,13 +18,13 @@ def householder(A, kmax=None):
     R = 1.0*A
     if kmax is None:
         kmax = n
-    kmax=min(m,kmax)
+    kmax = min(m,kmax)
     for k in range(kmax):
         x = R[k:,k]
         v = 1.0*x
         s = np.sign(x[0])
         if s==0:
-            s=1 #fixing sign(0)=1, which is not true in numpy
+            s = 1 #fixing sign(0)=1, which is not true in numpy
         v[0] += s * np.linalg.norm(x)
         v = v / np.linalg.norm(v)
         R[k:,k:] -= 2 * np.dot(np.outer(v, v.conj().transpose()), R[k:,k:])
@@ -65,7 +65,7 @@ def householder_qr(A):
     :return R: an mxn-dimensional numpy array
     """
     m, n = A.shape
-    I = np.eye(m)
+    I = np.eye(m, dtype = complex)
     Ahat = np.zeros((m, n+m), dtype = complex)
     Ahat[:, :n] = A
     Ahat[:, n:] = I

@@ -24,9 +24,8 @@ def basic_matvec(A, x):
     
     (m,n)=A.shape
     b=np.zeros(m)
-    for i in range(m):
-        for j in range(n):
-            b[i]=b[i]+A[i,j]*x[j]
+    for j in range(n):
+        b=b+A[:,j]*x[j]
     return b
 
 
