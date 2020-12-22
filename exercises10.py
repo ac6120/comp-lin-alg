@@ -64,9 +64,8 @@ def GMRES(A, b, maxit, tol, x0=None, return_residual_norms=False,
 
     nits = -1
     
-    x = 1.0*x0
     
-    r = np.array([], dtype=complex).reshape(m,0)
+    r = []
     rnorms = []
     
     for n in range(maxit):
@@ -76,8 +75,8 @@ def GMRES(A, b, maxit, tol, x0=None, return_residual_norms=False,
             H[j,n] = np.dot(Q[:,j].conj().transpose(), v)
             v -= H[j,n] * Q[:,j]
 
-        e1b = np.zeros((n+1,1))
-        e1b[0,0] = np.linalg.norm(b)
+        e1b = np.zeros(n+1)
+        e1b[0] = np.linalg.norm(b)
         
         H[n+1,n] = np.linalg.norm(v)
         Q[:,n+1] = v / H[n+1,n]
@@ -85,8 +84,9 @@ def GMRES(A, b, maxit, tol, x0=None, return_residual_norms=False,
         y = np.linalg.lstsq(H[:n+1,:n], e1b, rcond=None)[0]
         #y = householder_ls(H[:n+1,:n], e1b)[0]
         x = Q[:,:n] @ y
-        r = np.hstack((r, b-A.dot(x)))
-        rnorms.append(np.linalg.norm(r[:,n]))
+        r1 = b-A.dot(x)
+        r.append(r1)
+        rnorms.append(np.linalg.norm(r1))
 
         nits +=1
         
