@@ -30,19 +30,16 @@ def hessenberg(A):
     :param A: an mxm numpy array
     """
     m = A.shape[0]
-    H = A
     for k in range(m-2):
-        x = H[k+1:,k]
+        x = A[k+1:,k]
         v = 1.0*x
         s = np.sign(x[0])
         if s==0:
             s = 1 #fixing sign(0)=1, which is not true in numpy
-        H[k+1,k] = s * np.linalg.norm(x)
-        v[0] += H[k+1,k]
-        v = v / np.linalg.norm(v)
-        H[k+2:,k] = 0
-        H[k+1:,k+1:] -= 2 * np.dot(np.outer(v, v.conj().transpose()), H[k+1:,k+1:])
-        H[k:,k+1:] -= 2 * H[k:,k+1:].dot(np.outer(v, v.conj().transpose()))
+        v[0] += s * np.linalg.norm(x)
+        v /= np.linalg.norm(v)
+        A[k+1:,k:] -= 2 * np.outer(v, v.conj().dot(A[k+1:,k:]))
+        A[:,k+1:] -= 2 * np.outer(A[:,k+1:].dot(v), v.conj())
 
 
 def hessenbergQ(A):

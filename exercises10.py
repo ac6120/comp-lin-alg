@@ -82,7 +82,6 @@ def GMRES(A, b, maxit, tol, x0=None, return_residual_norms=False,
         Q[:,n+1] = v / H[n+1,n]
         
         y = np.linalg.lstsq(H[:n+1,:n], e1b, rcond=None)[0]
-        #y = householder_ls(H[:n+1,:n], e1b)[0]
         x = Q[:,:n] @ y
         r1 = b-A.dot(x)
         r.append(r1)
