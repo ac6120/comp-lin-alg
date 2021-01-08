@@ -163,7 +163,7 @@ def rq_it(A, x0, tol, maxit, store_iterations = False):
     raise NotImplementedError
 
 
-def pure_QR(A, maxit, tol):
+def pure_QR(A, maxit, tol, count_it=False):
     """
     For matrix A, apply the QR algorithm and return the result.
 
@@ -181,4 +181,6 @@ def pure_QR(A, maxit, tol):
         e = np.linalg.norm(np.diag(A0, -1))
         if (e < tol):
             break
+    if count_it==True:
+        return A0, i+1
     return A0
