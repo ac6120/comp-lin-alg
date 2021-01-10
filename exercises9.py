@@ -176,7 +176,7 @@ def pure_QR(A, maxit, tol, count_it=False):
     m = A.shape[0]
     A0 = 1.0*A
     for i in range(maxit):
-        Q, R = np.linalg.qr(A0)
+        Q, R = householder_qr(A0)
         A0 = R.dot(Q)
         e = np.linalg.norm(np.diag(A0, -1))
         if (e < tol):

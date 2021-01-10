@@ -15,19 +15,18 @@ def householder(A, kmax=None):
     """
 
     m, n = A.shape
-    R = 1.0*A
+    R = (1.0+0j)*A
     if kmax is None:
         kmax = n
     kmax = min(m,kmax)
     for k in range(kmax):
-        x = R[k:,k]
-        v = 1.0*x
-        s = np.sign(x[0])
-        if s==0:
-            s = 1 #fixing sign(0)=1, which is not true in numpy
-        v[0] += s * np.linalg.norm(x)
+        x = 1.0 * R[k:,k]
+        v = (1.0+0j) * x
+        arg = np.angle(x[0])
+        coeff = np.exp(1j * arg)
+        v[0] += coeff * np.linalg.norm(x)
         v = v / np.linalg.norm(v)
-        R[k:,k:] -= 2 * np.dot(np.outer(v, v.conj().transpose()), R[k:,k:])
+        R[k:,k:] -= 2 * np.outer(v, np.dot(v.conj().transpose(), R[k:,k:]))
     return R
 
 
