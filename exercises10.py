@@ -62,8 +62,7 @@ def GMRES(A, b, maxit, tol, x0=None, return_residual_norms=False,
 
     H = np.zeros((maxit+1,maxit), dtype=complex)
 
-    nits = -1
-    
+    nits = -1    
     
     r = []
     rnorms = []
